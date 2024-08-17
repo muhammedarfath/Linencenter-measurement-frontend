@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+body {
+  @apply bg-[#000] text-white;
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+}
+
+button:hover .arrow {
+  transform: translateX(5px);
+}
+
+
+/* Define the shake animation */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(0); }
+  75% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
+
+/* Apply the animation to the arrow */
+.shake {
+  animation: shake 0.5s ease-in-out infinite;
+}
