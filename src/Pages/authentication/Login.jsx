@@ -1,31 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
 function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post("https://your-api-endpoint/login", {
+        email,
+        password,
+      });
+      
+      console.log(response.data); 
+    } catch (error) {
+      console.error("Login failed", error);
+      setError("Invalid email or password.");
+    }
+  };
+
   return (
     <div>
-      <section class="">
-        <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+      <section>
+        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <a
             href="#"
-            class="flex items-center mb-6 text-2xl font-semibold text-white"
+            className="flex items-center mb-6 text-2xl font-semibold text-white"
           >
             <img
-              class="w-28 h-28 mr-2 object-cover"
+              className="w-28 h-28 mr-2 object-cover"
               src="https://linencentre.in/measurement/images/06.png"
               alt="logo"
             />
             Linen Centre
           </a>
-          <div class="w-full bg-black rounded-lg shadow sm:max-w-md xl:p-0 border-gray-500 border">
-            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-              <h1 class="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl">
+          <div className="w-full bg-black rounded-lg shadow sm:max-w-md xl:p-0 border-gray-500 border">
+            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+              <h1 className="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl">
                 Sign in to your account
               </h1>
-              <form class="space-y-4 md:space-y-6" action="#">
+              {error && (
+                <div className="text-red-500 text-sm">{error}</div>
+              )}
+              <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <label
-                    for="email"
-                    class="block mb-2 text-sm font-medium text-white"
+                    htmlFor="email"
+                    className="block mb-2 text-sm font-medium text-white"
                   >
                     Your email
                   </label>
@@ -33,15 +57,17 @@ function Login() {
                     type="email"
                     name="email"
                     id="email"
-                    class="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     placeholder="name@company.com"
-                    required=""
+                    required
                   />
                 </div>
                 <div>
                   <label
-                    for="password"
-                    class="block mb-2 text-sm font-medium text-white"
+                    htmlFor="password"
+                    className="block mb-2 text-sm font-medium text-white"
                   >
                     Password
                   </label>
@@ -49,14 +75,16 @@ function Login() {
                     type="password"
                     name="password"
                     id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    class="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    required=""
+                    className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    required
                   />
                 </div>
                 <button
                   type="submit"
-                  class="w-full border text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                  className="w-full border text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                 >
                   Sign in
                 </button>
