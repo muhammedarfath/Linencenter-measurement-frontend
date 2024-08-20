@@ -1,24 +1,37 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; 
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("https://measurement.linencentre.in/action-login.php", {
-        email,
-        password,
-      });
-      
+      const response = await axios.post(
+        "http://localhost:8000/accounts/login/", 
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true, 
+        }
+      );
+
       console.log(response.data); 
+      setSuccess("Login successful!");
+      setError("");
+      navigate("/");
     } catch (error) {
       console.error("Login failed", error);
       setError("Invalid email or password.");
+      setSuccess("");
     }
   };
 
@@ -44,6 +57,9 @@ function Login() {
               </h1>
               {error && (
                 <div className="text-red-500 text-sm">{error}</div>
+              )}
+              {success && (
+                <div className="text-green-500 text-sm">{success}</div>
               )}
               <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
                 <div>
