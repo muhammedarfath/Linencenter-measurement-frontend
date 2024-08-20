@@ -1,40 +1,33 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom"; 
+import { Navigate } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { signUp } from "../../actions/auth"; 
+import CSRFToken from '../../components/CSRFToken';
 
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const navigate = useNavigate();
-  
-  const handleSubmit = async (e) => {
+function SignUp({ signUp, isAuthenticated }) {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    re_password: "",
+  });
+  const [accountCreated, setAccountCreated] = useState(false);
+
+  const { email, password, re_password } = formData;
+
+  const onChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const onSubmit = (e) => {
     e.preventDefault();
-    
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/accounts/login/", 
-        {
-          email,
-          password,
-        },
-        {
-          withCredentials: true, 
-        }
-      );
-
-      console.log(response.data); 
-      setSuccess("Login successful!");
-      setError("");
-      navigate("/");
-    } catch (error) {
-      console.error("Login failed", error);
-      setError("Invalid email or password.");
-      setSuccess("");
+    if (password === re_password) {
+      signUp(email, password, re_password); 
+      setAccountCreated(true);
     }
   };
+
+  if (isAuthenticated) return <Navigate to="/" />;
+  else if (accountCreated) return <Navigate to="/login" />;
 
   return (
     <div>
@@ -54,15 +47,11 @@ function Login() {
           <div className="w-full bg-black rounded-lg shadow sm:max-w-md xl:p-0 border-gray-500 border">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl">
-                Sign in to your account
+                Sign up for an account
               </h1>
-              {error && (
-                <div className="text-red-500 text-sm">{error}</div>
-              )}
-              {success && (
-                <div className="text-green-500 text-sm">{success}</div>
-              )}
-              <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+
+              <form className="space-y-4 md:space-y-6" onSubmit={onSubmit}>
+                <CSRFToken />
                 <div>
                   <label
                     htmlFor="email"
@@ -75,7 +64,7 @@ function Login() {
                     name="email"
                     id="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={onChange}
                     className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     placeholder="name@company.com"
                     required
@@ -93,7 +82,25 @@ function Login() {
                     name="password"
                     id="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={onChange}
+                    placeholder="••••••••"
+                    className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="re_password"
+                    className="block mb-2 text-sm font-medium text-white"
+                  >
+                    Re-enter Password
+                  </label>
+                  <input
+                    type="password"
+                    name="re_password"
+                    id="re_password"
+                    value={re_password}
+                    onChange={onChange}
                     placeholder="••••••••"
                     className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     required
@@ -103,7 +110,7 @@ function Login() {
                   type="submit"
                   className="w-full border text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                 >
-                  Sign in
+                  Sign Up
                 </button>
               </form>
             </div>
@@ -114,4 +121,8 @@ function Login() {
   );
 }
 
-export default Login;
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated
+});
+
+export default connect(mapStateToProps, { signUp })(SignUp);
