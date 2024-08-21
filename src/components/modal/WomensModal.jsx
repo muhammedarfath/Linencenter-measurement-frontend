@@ -5,17 +5,25 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
   useDisclosure,
 } from "@nextui-org/react";
-import axios from "axios";
 import useAxios from "../../axios";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import CommonOrderDetails from "../CommonOrderDetails";
+import { FaShopify } from "react-icons/fa";
+import WomenItems from "../WomenItems";
+import WomenMeasurement from "../WomenMeasurement";
+import { GiThermometerScale } from "react-icons/gi";
 
 export default function WomensModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const axiosinstance = useAxios();
+  const [showWomenDetails, setShowWomenDetails] = useState(false);
+  const [showMeasurementDetails, SetMeasurementDetails] = useState(false);
+  const [imagePreview, setImagePreview] = useState(
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVP-GHgKmboz8wPoK9smYXsYbMQ4ck2I5Vog&s"
+  );
+
   const [formData, setFormData] = useState({
     // CommonOrderDetails fields
     order_no: "",
@@ -73,6 +81,13 @@ export default function WomensModal() {
     remarks: "",
   });
 
+  const handleWomenItemsClick = () => {
+    setShowWomenDetails(!showWomenDetails);
+  };
+
+  const handleWomenMeasurement = () => {
+    SetMeasurementDetails(!showMeasurementDetails);
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -80,6 +95,17 @@ export default function WomensModal() {
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({
+        ...formData,
+        order_image: file,
+      });
+      setImagePreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -137,589 +163,44 @@ export default function WomensModal() {
                   <CommonOrderDetails
                     handleChange={handleChange}
                     formData={formData}
+                    handleImageChange={handleImageChange}
+                    imagePreview={imagePreview}
                   />
 
-                  <hr />
-                  <div className="grid lg:grid-cols-3 gap-6 mt-6">
-                    {/* Churithar Section */}
-                    <div className="flex gap-3 items-center">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          name="churithar_selected"
-                          id="churithar_selected"
-                          checked={formData.churithar_selected}
-                          onChange={handleChange}
-                          className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded mr-2"
-                        />
-                        <label
-                          htmlFor="churithar_selected"
-                          className="text-base font-medium text-[#07074D]"
-                        >
-                          Churithar
-                        </label>
-                      </div>
-                      <input
-                        type="number"
-                        name="churithar_quantity"
-                        value={formData.churithar_quantity}
-                        onChange={handleChange}
-                        placeholder="Quantity"
-                        min="0"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                      <input
-                        type="text"
-                        name="churithar_description"
-                        value={formData.churithar_description}
-                        onChange={handleChange}
-                        placeholder="Description"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
 
-                    {/* Kurthi Section */}
-                    <div className="flex gap-3 items-center">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          name="kurthi_selected"
-                          id="kurthi_selected"
-                          checked={formData.kurthi_selected}
-                          onChange={handleChange}
-                          className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded mr-2"
-                        />
-                        <label
-                          htmlFor="kurthi_selected"
-                          className="text-base font-medium text-[#07074D]"
-                        >
-                          Kurthi
-                        </label>
-                      </div>
-                      <input
-                        type="number"
-                        name="kurthi_quantity"
-                        value={formData.kurthi_quantity}
-                        onChange={handleChange}
-                        placeholder="Quantity"
-                        min="0"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                      <input
-                        type="text"
-                        name="kurthi_description"
-                        value={formData.kurthi_description}
-                        onChange={handleChange}
-                        placeholder="Description"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    {/* Pant Section */}
-                    <div className="flex gap-3 items-center">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          name="pant_selected"
-                          id="pant_selected"
-                          checked={formData.pant_selected}
-                          onChange={handleChange}
-                          className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded mr-2"
-                        />
-                        <label
-                          htmlFor="pant_selected"
-                          className="text-base font-medium text-[#07074D]"
-                        >
-                          Pant
-                        </label>
-                      </div>
-                      <input
-                        type="number"
-                        name="pant_quantity"
-                        value={formData.pant_quantity}
-                        onChange={handleChange}
-                        placeholder="Quantity"
-                        min="0"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                      <input
-                        type="text"
-                        name="pant_description"
-                        value={formData.pant_description}
-                        onChange={handleChange}
-                        placeholder="Description"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    {/* Blouse Section */}
-                    <div className="flex gap-3 items-center">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          name="blouse_selected"
-                          id="blouse_selected"
-                          checked={formData.blouse_selected}
-                          onChange={handleChange}
-                          className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded mr-2"
-                        />
-                        <label
-                          htmlFor="blouse_selected"
-                          className="text-base font-medium text-[#07074D]"
-                        >
-                          Blouse
-                        </label>
-                      </div>
-                      <input
-                        type="number"
-                        name="blouse_quantity"
-                        value={formData.blouse_quantity}
-                        onChange={handleChange}
-                        placeholder="Quantity"
-                        min="0"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                      <input
-                        type="text"
-                        name="blouse_description"
-                        value={formData.blouse_description}
-                        onChange={handleChange}
-                        placeholder="Description"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    {/* Frock Section */}
-                    <div className="flex gap-3 items-center">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          name="frock_selected"
-                          id="frock_selected"
-                          checked={formData.frock_selected}
-                          onChange={handleChange}
-                          className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded mr-2"
-                        />
-                        <label
-                          htmlFor="frock_selected"
-                          className="text-base font-medium text-[#07074D]"
-                        >
-                          Frock
-                        </label>
-                      </div>
-                      <input
-                        type="number"
-                        name="frock_quantity"
-                        value={formData.frock_quantity}
-                        onChange={handleChange}
-                        placeholder="Quantity"
-                        min="0"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                      <input
-                        type="text"
-                        name="frock_description"
-                        value={formData.frock_description}
-                        onChange={handleChange}
-                        placeholder="Description"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    {/* Others Section */}
-                    <div className="flex gap-3 items-center">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          name="others_selected"
-                          id="others_selected"
-                          checked={formData.others_selected}
-                          onChange={handleChange}
-                          className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded mr-2"
-                        />
-                        <label
-                          htmlFor="others_selected"
-                          className="text-base font-medium text-[#07074D]"
-                        >
-                          Others
-                        </label>
-                      </div>
-                      <input
-                        type="number"
-                        name="others_quantity"
-                        value={formData.others_quantity}
-                        onChange={handleChange}
-                        placeholder="Quantity"
-                        min="0"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                      <input
-                        type="text"
-                        name="others_description"
-                        value={formData.others_description}
-                        onChange={handleChange}
-                        placeholder="Description"
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-                    <div className="flex items-center">
-                      <label
-                        htmlFor="total"
-                        className="text-base font-medium text-[#07074D] mr-4"
-                      >
-                        Total:
-                      </label>
-                      <input
-                        type="number"
-                        name="total"
-                        id="total"
-                        value={formData.total}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none"
-                      />
-                    </div>
+                  <div
+                    class="bg-gray-300 cursor-pointer hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex gap-3 items-center mb-3"
+                    onClick={handleWomenItemsClick}
+                  >
+                    <FaShopify />
+                    <span>Womens Items</span>
                   </div>
+                  <hr className="mb-3" />
+                  {showWomenDetails && (
+                    <WomenItems
+                      handleChange={handleChange}
+                      formData={formData}
+                    />
+                  )}
 
-                  <hr className="mt-4"/>
+                  <hr className="mt-4 mb-4" />
 
-                  <div className="grid gap-6 mt-6">
-                    <div className="mb-4">
-                      <label
-                        htmlFor="CL"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        CL
-                      </label>
-                      <input
-                        type="text"
-                        id="CL"
-                        name="CL"
-                        value={formData.CL}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label
-                        htmlFor="WL"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        WL
-                      </label>
-                      <input
-                        type="text"
-                        id="WL"
-                        name="WL"
-                        value={formData.WL}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label
-                        htmlFor="CL"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        L
-                      </label>
-                      <input
-                        type="text"
-                        id="L"
-                        name="L"
-                        value={formData.L}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label
-                        htmlFor="SH"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        SH
-                      </label>
-                      <input
-                        type="text"
-                        id="SH"
-                        name="SH"
-                        value={formData.SH}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label
-                        htmlFor="SL"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        SL
-                      </label>
-                      <input
-                        type="text"
-                        id="SL"
-                        name="SL"
-                        value={formData.SL}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label
-                        htmlFor="SW"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        SW
-                      </label>
-                      <input
-                        type="text"
-                        id="SW"
-                        name="SW"
-                        value={formData.SW}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label
-                        htmlFor="AH"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        AH
-                      </label>
-                      <input
-                        type="text"
-                        id="AH"
-                        name="AH"
-                        value={formData.AH}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label
-                        htmlFor="FC"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        FC
-                      </label>
-                      <input
-                        type="text"
-                        id="FC"
-                        name="FC"
-                        value={formData.FC}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    {/* Repeat the same structure for all other fields */}
-                    <div className="mb-4">
-                      <label
-                        htmlFor="CH"
-                        cCHassName="block text-sm font-medium text-gray-700"
-                      >
-                        CH
-                      </label>
-                      <input
-                        type="text"
-                        id="CH"
-                        name="CH"
-                        value={formData.CH}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label
-                        htmlFor="BR"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        BR
-                      </label>
-                      <input
-                        type="text"
-                        id="BR"
-                        name="BR"
-                        value={formData.BR}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-                    {/* Repeat the same structure for all other fields */}
-                    <div className="mb-4">
-                      <label
-                        htmlFor="W"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        W
-                      </label>
-                      <input
-                        type="text"
-                        id="W"
-                        name="W"
-                        value={formData.W}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label
-                        htmlFor="SW2"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        SW2
-                      </label>
-                      <input
-                        type="text"
-                        id="SW2"
-                        name="SW2"
-                        value={formData.SW2}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-                    {/* Repeat the same structure for all other fields */}
-                    <div className="mb-4">
-                      <label
-                        htmlFor="SE"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        SE
-                      </label>
-                      <input
-                        type="text"
-                        id="SE"
-                        name="SE"
-                        value={formData.L}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label
-                        htmlFor="SLIT"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        SLIT
-                      </label>
-                      <input
-                        type="text"
-                        id="SLIT"
-                        name="SLIT"
-                        value={formData.SLIT}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-                    {/* Repeat the same structure for all other fields */}
-                    <div className="mb-4">
-                      <label
-                        htmlFor="FN"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        FN
-                      </label>
-                      <input
-                        type="text"
-                        id="FN"
-                        name="FN"
-                        value={formData.FN}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label
-                        htmlFor="BN"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        BN
-                      </label>
-                      <input
-                        type="text"
-                        id="BN"
-                        name="BN"
-                        value={formData.BN}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-                    {/* Repeat the same structure for all other fields */}
-                    <div className="mb-4">
-                      <label
-                        htmlFor="NW"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        NW
-                      </label>
-                      <input
-                        type="text"
-                        id="NW"
-                        name="NW"
-                        value={formData.NW}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label
-                        htmlFor="BL"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        BL
-                      </label>
-                      <input
-                        type="text"
-                        id="BL"
-                        name="BL"
-                        value={formData.BL}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-                    {/* Repeat the same structure for all other fields */}
-                    <div className="mb-4">
-                      <label
-                        htmlFor="BW"
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        BW
-                      </label>
-                      <input
-                        type="text"
-                        id="BW"
-                        name="BW"
-                        value={formData.BW}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      />
-                    </div>
-
-                    <div className="mb-5">
-                      <label
-                        htmlFor="remarks"
-                        className="mb-3 block text-base font-medium text-[#07074D]"
-                      >
-                        Remarks
-                      </label>
-                      <textarea
-                        name="remarks"
-                        id="remarks"
-                        placeholder="Enter any additional remarks"
-                        value={formData.remarks}
-                        onChange={handleChange}
-                        className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                      ></textarea>
-                    </div>
+                  <div
+                    class="bg-gray-300 cursor-pointer hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex gap-3 items-center mb-3"
+                    onClick={handleWomenMeasurement}
+                  >
+                    <GiThermometerScale />
+                    <span>Measurement</span>
                   </div>
+                  <hr className="mb-3" />
+                  {showMeasurementDetails && (
+                    <WomenMeasurement
+                      handleChange={handleChange}
+                      formData={formData}
+                    />
+                  )}
+
+
                   <button
                     type="submit"
                     className="mt-6 w-full rounded-md bg-[#000] py-3 px-6 text-base font-medium text-white  focus:outline-none focus:ring-2 focus:ring-[#000] focus:ring-offset-2"

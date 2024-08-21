@@ -4,33 +4,42 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../Redux/Auth/authSlice";
 import { Toaster, toast } from "react-hot-toast";
+import LoginForm from "./LoginForm";
 function Login() {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); 
-  const [success, setSuccess] = useState(""); 
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post("http://127.0.0.1:8000/accounts/login/", {
-        email,
-        password,
-      });
-
+      const response = await axios.post(
+        "http://127.0.0.1:8000/accounts/login/",
+        {
+          email,
+          password,
+        }
+      );
       const { access, refresh, username: userData, userId } = response.data;
 
-      dispatch(loginSuccess({ email: userData, userId: userId, token: access, refresh: refresh }));
-
-      setSuccess("Login successful."); 
+      dispatch(
+        loginSuccess({
+          email: userData,
+          userId: userId,
+          token: access,
+          refresh: refresh,
+        })
+      );
+      toast.success("Login successful.")
+      setSuccess("Login successful.");
       console.log("Login successful. UserId:", userId);
       console.log("Access token:", access);
       console.log("Refresh token:", refresh);
 
-      navigate('/');
+      navigate("/");
     } catch (error) {
       console.error("Login error:", error);
 
@@ -40,14 +49,19 @@ function Login() {
         let errorMessage = "Login failed. Please check your credentials.";
 
         if (status === 400) {
-          errorMessage = data.non_field_errors ? data.non_field_errors[0] : errorMessage;
+          errorMessage = data.non_field_errors
+            ? data.non_field_errors[0]
+            : errorMessage;
         }
-
-        setError(errorMessage); 
-        toast.error(errorMessage); 
+        setError(errorMessage);
+        toast.error(errorMessage);
       } else {
-        setError("An error occurred. Please check your network connection and try again.");
-        toast.error("An error occurred. Please check your network connection and try again.");
+        setError(
+          "An error occurred. Please check your network connection and try again."
+        );
+        toast.error(
+          "An error occurred. Please check your network connection and try again."
+        );
       }
     }
   };
@@ -76,56 +90,17 @@ function Login() {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl">
                 Sign in to your account
               </h1>
-              {error && (
-                <div className="text-red-500 text-sm">{error}</div>
-              )}
+              {error && <div className="text-red-500 text-sm">{error}</div>}
               {success && (
                 <div className="text-green-500 text-sm">{success}</div>
               )}
-              <form className="space-y-4 md:space-y-6" onSubmit={handleLoginSubmit}>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block mb-2 text-sm font-medium text-white"
-                  >
-                    Your email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    placeholder="email"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block mb-2 text-sm font-medium text-white"
-                  >
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="password"
-                    className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full border text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                >
-                  Sign in
-                </button>
-              </form>
+              <LoginForm
+                handleLoginSubmit={handleLoginSubmit}
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+              />
             </div>
           </div>
         </div>

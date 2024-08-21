@@ -37,21 +37,6 @@ function Cards() {
           </CardBody>
           <MensModal />
         </Card>
-
-        {/* <Card className="w-full max-w-xs py-4 rounded-xl cursor-pointer items-center">
-          <CardHeader className="pb-0 pt-2 px-4 flex-col items-center">
-            <p className="text-tiny uppercase font-bold">Kids</p>
-          </CardHeader>
-          <CardBody className="overflow-visible py-2">
-            <Image
-              alt="Card background"
-              className="object-cover rounded-xl"
-              src="https://i.pinimg.com/564x/37/10/af/3710af0a81b850fcea833ac8e71836db.jpg"
-              width={270}
-            />
-          </CardBody>
-          <KidsModal />
-        </Card> */}
       </div>
       <div className="flex flex-col sm:flex-row  mt-6">
         <Link to="/orderdetails">

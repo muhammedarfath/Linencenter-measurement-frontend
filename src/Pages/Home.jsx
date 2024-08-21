@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { LampContainer } from "../components/ui/lamp";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Toaster, toast } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 
 export function Home() {
   const { userId } = useSelector((state) => state.auth);

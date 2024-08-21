@@ -5,6 +5,9 @@ import { FaEdit } from "react-icons/fa";
 import EditDetailModal from "../../components/modal/EditDetailModal";
 import { useDisclosure } from "@nextui-org/react";
 import { Toaster, toast } from "react-hot-toast";
+import { MdSearch } from "react-icons/md";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 function OrderDetails() {
   const [orderDetails, setOrderDetails] = useState([]);
@@ -96,7 +99,35 @@ function OrderDetails() {
     { label: "Bill Invoice No", key: "bill_invoice_no" },
     { label: "Status", key: "status" },
   ];
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
 
+    doc.autoTable({
+      head: [
+        [
+          "Order Number",
+          "Customer Name",
+          "Phone",
+          "Booking Date",
+          "Delivery Date",
+          "Bill Invoice No",
+          "Status",
+        ],
+      ],
+      body: filteredOrders.map((order) => [
+        order.order_no,
+        order.name,
+        order.phone,
+        order.booking_date,
+        order.delivery_date,
+        order.bill_invoice_no,
+        order.status || "ordered",
+      ]),
+      margin: { top: 10 },
+    });
+
+    doc.save("order-details.pdf");
+  };
   return (
     <div className="overflow-x-auto shadow-md sm:rounded-lg container mx-auto mt-9 flex flex-col">
       <Toaster position="top-right" reverseOrder={false} />
@@ -126,22 +157,32 @@ function OrderDetails() {
           </button>
         </div>
 
-        <input
-          type="text"
-          placeholder="Search by customer name"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)} // Update search term on change
-          className="block p-2 text-sm text-white border border-gray-300 rounded-lg w-full sm:w-60 bg-black focus:ring-blue-500 focus:border-blue-500"
-        />
-
-        <CSVLink
-          data={filteredOrders}
-          headers={csvHeaders}
-          filename="order-details.csv"
-          className="inline-flex items-center text-white bg-green-600 border border-gray-300 focus:outline-none hover:bg-green-700 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm px-4 py-2 mt-4 sm:mt-0"
-        >
-          Export CSV
-        </CSVLink>
+        <div className="relative w-full sm:w-60">
+          <input
+            type="text"
+            placeholder="Search by customer name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="block p-4 pl-10 text-sm text-white border border-gray-300 rounded-lg w-full bg-black focus:ring-blue-500 focus:border-blue-500"
+          />
+          <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        </div>
+        <div>
+          <CSVLink
+            data={filteredOrders}
+            headers={csvHeaders}
+            filename="order-details.csv"
+            className="inline-flex items-center text-white bg-green-600 border border-gray-300 focus:outline-none hover:bg-green-700 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm px-4 py-2 mt-4 sm:mt-0"
+          >
+            Export CSV
+          </CSVLink>
+          <button
+            onClick={handleDownloadPDF}
+            className="ml-2 inline-flex items-center text-white bg-red-600 border border-gray-300 focus:outline-none hover:bg-red-700 focus:ring-4 focus:ring-red-500 font-medium rounded-lg text-sm px-4 py-2 mt-4 sm:mt-0"
+          >
+            Download PDF
+          </button>
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-white">
