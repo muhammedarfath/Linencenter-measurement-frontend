@@ -1,6 +1,6 @@
 import React from "react";
 
-function PantOrderDetails({handleChange,formData}) {
+function PantOrderDetails({ handleChange, formData }) {
   return (
     <>
       <div className="grid lg:grid-cols-5 gap-6 mt-6">
@@ -351,23 +351,23 @@ function PantOrderDetails({handleChange,formData}) {
             className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
           />
         </div>
-
-        <div className="mb-5">
-          <label
-            htmlFor="remarks"
-            className="mb-3 block text-base font-medium text-[#07074D]"
-          >
-            Remarks
-          </label>
-          <textarea
-            name="remarks"
-            id="remarks"
-            placeholder="Enter any additional remarks"
-            value={formData.remarks}
-            onChange={handleChange}
-            className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-          ></textarea>
-        </div>
+      </div>
+      <div className="mb-5">
+        <label
+          htmlFor="remark"
+          className="mb-3 block text-base font-medium text-[#07074D]"
+        >
+          Remarks
+        </label>
+        <textarea
+          type="text"
+          name="remark"
+          id="remark"
+          placeholder="Remark"
+          value={formData.remark}
+          onChange={handleChange}
+          className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+        />
       </div>
     </>
   );

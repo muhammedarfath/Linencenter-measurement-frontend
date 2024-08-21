@@ -177,7 +177,7 @@ function CommonOrderDetails({
       </div>
       <div className="mb-5">
         <label
-          htmlFor="invoiceNumber"
+          htmlFor="Cut Pieces"
           className="mb-3 block text-base font-medium text-[#07074D]"
         >
           Cut Pieces

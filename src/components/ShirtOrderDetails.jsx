@@ -317,18 +317,18 @@ function ShirtOrderDetails({ handleChange, formData }) {
 
         <div className="mb-5">
           <label
-            htmlFor="no_pleat"
+            htmlFor="reverse_cut_way"
             className="mb-3 block text-base font-medium text-[#07074D]"
           >
             Reverse Cut Way
           </label>
           <input
             type="checkbox"
-            name="no_pleat"
-            id="no_pleat"
+            name="reverse_cut_way"
+            id="reverse_cut_way"
             checked={formData.reverse_cut_way}
             onChange={handleChange}
-            className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded"
+            className="h-5 w-5 rounded border border-[#e0e0e0] bg-white text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
           />
         </div>
 
@@ -341,8 +341,8 @@ function ShirtOrderDetails({ handleChange, formData }) {
           </label>
           <input
             type="checkbox"
-            name="no_pleat"
-            id="no_pleat"
+            name="bottom_line_cut"
+            id="bottom_line_cut"
             checked={formData.bottom_line_cut}
             onChange={handleChange}
             className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded"
@@ -358,8 +358,8 @@ function ShirtOrderDetails({ handleChange, formData }) {
           </label>
           <input
             type="checkbox"
-            name="no_pleat"
-            id="no_pleat"
+            name="straight_cut"
+            id="straight_cut"
             checked={formData.straight_cut}
             onChange={handleChange}
             className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded"
@@ -374,8 +374,8 @@ function ShirtOrderDetails({ handleChange, formData }) {
           </label>
           <input
             type="checkbox"
-            name="no_pleat"
-            id="no_pleat"
+            name="slit"
+            id="slit"
             checked={formData.slit}
             onChange={handleChange}
             className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded"
@@ -391,8 +391,8 @@ function ShirtOrderDetails({ handleChange, formData }) {
           </label>
           <input
             type="checkbox"
-            name="no_pleat"
-            id="no_pleat"
+            name="linen_pady"
+            id="linen_pady"
             checked={formData.linen_pady}
             onChange={handleChange}
             className="h-6 w-6 text-[#6A64F1] focus:ring-[#6A64F1] border-gray-300 rounded"
@@ -408,10 +408,10 @@ function ShirtOrderDetails({ handleChange, formData }) {
         </label>
         <textarea
           type="text"
-          name="remark"
-          id="remark"
+          name="remarkshirt"
+          id="remarkshirt"
           placeholder="Remark"
-          value={formData.remark}
+          value={formData.remarkshirt}
           onChange={handleChange}
           className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
         />
