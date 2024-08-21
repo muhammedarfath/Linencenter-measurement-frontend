@@ -2,13 +2,12 @@ import React from "react";
 import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
 import MensModal from "../components/modal/MensModal";
 import WomensModal from "../components/modal/WomensModal";
-import KidsModal from "../components/modal/KidsModal";
 import { Link } from "react-router-dom";
 
 function Cards() {
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="flex w-3/4 flex-wrap gap-8 justify-center items-center px-4 py-8 rounded-2xl backdrop-blur bg-white bg-opacity-10">
+      <div className="flex w-2/4 flex-wrap gap-8 justify-center items-center px-4 py-8 rounded-2xl backdrop-blur bg-white bg-opacity-10">
         <Card className="w-full max-w-xs py-4 rounded-xl flex items-center  cursor-pointer">
           <CardHeader className="pb-0 pt-2 px-4 flex-col items-center">
             <p className="text-tiny uppercase font-bold">Womens</p>
@@ -39,7 +38,7 @@ function Cards() {
           <MensModal />
         </Card>
 
-        <Card className="w-full max-w-xs py-4 rounded-xl cursor-pointer items-center">
+        {/* <Card className="w-full max-w-xs py-4 rounded-xl cursor-pointer items-center">
           <CardHeader className="pb-0 pt-2 px-4 flex-col items-center">
             <p className="text-tiny uppercase font-bold">Kids</p>
           </CardHeader>
@@ -52,7 +51,7 @@ function Cards() {
             />
           </CardBody>
           <KidsModal />
-        </Card>
+        </Card> */}
       </div>
       <div className="flex flex-col sm:flex-row  mt-6">
         <Link to="/orderdetails">

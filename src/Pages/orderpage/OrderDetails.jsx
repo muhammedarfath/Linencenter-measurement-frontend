@@ -1,190 +1,172 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import useAxios from "../../axios";
+import { CSVLink } from "react-csv";
+import { FaEdit } from "react-icons/fa";
+import EditDetailModal from "../../components/modal/EditDetailModal";
+import { useDisclosure } from "@nextui-org/react";
+import { Toaster, toast } from "react-hot-toast";
 
 function OrderDetails() {
+  const [orderDetails, setOrderDetails] = useState([]);
+  const [sortedOrderDetails, setSortedOrderDetails] = useState([]);
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentOrder, setCurrentOrder] = useState(null);
+  const axiosinstance = useAxios();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      try {
+        const response = await axiosinstance.get("measurement/order-details/");
+        setOrderDetails(response.data);
+        setSortedOrderDetails(response.data);
+      } catch (error) {
+        console.error("Error fetching order details:", error);
+      }
+    };
+
+    fetchOrderDetails();
+  }, []);
+
+  const handleStatusChange = async (id, status) => {
+    try {
+      await axiosinstance.put(`/measurement/update-status/${id}/`, { status });
+      const updatedOrderDetails = sortedOrderDetails.map((order) =>
+        order.id === id ? { ...order, status } : order
+      );
+      setSortedOrderDetails(updatedOrderDetails);
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
+  const openEditModal = (order) => {
+    setCurrentOrder(order);
+    onOpen();
+  };
+
+  const closeModal = () => {
+    onClose();
+    setCurrentOrder(null);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axiosinstance.put(
+        `/measurement/edit/${currentOrder.id}/`,
+        currentOrder
+      );
+      setSortedOrderDetails(
+        sortedOrderDetails.map((order) =>
+          order.id === currentOrder.id ? currentOrder : order
+        )
+      );
+      toast.success("Order updated successfully!");
+      closeModal();
+    } catch (error) {
+      console.error("Error updating order:", error);
+      toast.error("Error updating order. Please try again.");
+    }
+  };
+
+  const handleDateRangeChange = () => {
+    if (dateRange.start && dateRange.end) {
+      const filteredOrders = orderDetails.filter((order) => {
+        const orderDate = new Date(order.booking_date);
+        const startDate = new Date(dateRange.start);
+        const endDate = new Date(dateRange.end);
+        return orderDate >= startDate && orderDate <= endDate;
+      });
+      setSortedOrderDetails(filteredOrders);
+    }
+  };
+
+  const filteredOrders = sortedOrderDetails.filter((order) =>
+    order.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const csvHeaders = [
+    { label: "Order Number", key: "order_no" },
+    { label: "Customer Name", key: "name" },
+    { label: "Phone", key: "phone" },
+    { label: "Booking Date", key: "booking_date" },
+    { label: "Delivery Date", key: "delivery_date" },
+    { label: "Bill Invoice No", key: "bill_invoice_no" },
+    { label: "Status", key: "status" },
+  ];
+
   return (
-    <div className="overflow-x-auto shadow-md sm:rounded-lg container mx-auto mt-9 flex justify-center flex-col">
+    <div className="overflow-x-auto shadow-md sm:rounded-lg container mx-auto mt-9 flex flex-col">
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="flex flex-col sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
-        <div>
-          <button
-            id="dropdownRadioButton"
-            data-dropdown-toggle="dropdownRadio"
-            className="inline-flex items-center text-white bg-black border border-gray-300 focus:outline-none hover:bg-gray-900 focus:ring-4 focus:ring-gray-700 font-medium rounded-lg text-sm px-3 py-1.5"
-            type="button"
-          >
-            <svg
-              className="w-3 h-3 text-gray-500 me-3"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm3.982 13.982a1 1 0 0 1-1.414 0l-3.274-3.274A1.012 1.012 0 0 1 9 10V6a1 1 0 0 1 2 0v3.586l2.982 2.982a1 1 0 0 1 0 1.414Z" />
-            </svg>
-            Last 30 days
-            <svg
-              className="w-2.5 h-2.5 ms-2.5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 10 6"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m1 1 4 4 4-4"
-              />
-            </svg>
-          </button>
-          <div
-            id="dropdownRadio"
-            className="z-10 hidden w-48 bg-black divide-y divide-gray-100 rounded-lg shadow"
-            style={{
-              position: "absolute",
-              inset: "auto auto 0px 0px",
-              margin: "0px",
-              transform: "translate3d(522.5px, 3847.5px, 0px)",
-            }}
-          >
-            <ul className="p-3 space-y-1 text-sm text-white">
-              <li>
-                <div className="flex items-center p-2 rounded hover:bg-gray-700">
-                  <input
-                    id="filter-radio-example-1"
-                    type="radio"
-                    value=""
-                    name="filter-radio"
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                  />
-                  <label
-                    htmlFor="filter-radio-example-1"
-                    className="w-full ms-2 text-sm font-medium text-white rounded"
-                  >
-                    Last day
-                  </label>
-                </div>
-              </li>
-              <li>
-                <div className="flex items-center p-2 rounded hover:bg-gray-700">
-                  <input
-                    checked
-                    id="filter-radio-example-2"
-                    type="radio"
-                    value=""
-                    name="filter-radio"
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                  />
-                  <label
-                    htmlFor="filter-radio-example-2"
-                    className="w-full ms-2 text-sm font-medium text-white rounded"
-                  >
-                    Last 7 days
-                  </label>
-                </div>
-              </li>
-              <li>
-                <div className="flex items-center p-2 rounded hover:bg-gray-700">
-                  <input
-                    id="filter-radio-example-3"
-                    type="radio"
-                    value=""
-                    name="filter-radio"
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                  />
-                  <label
-                    htmlFor="filter-radio-example-3"
-                    className="w-full ms-2 text-sm font-medium text-white rounded"
-                  >
-                    Last 30 days
-                  </label>
-                </div>
-              </li>
-              <li>
-                <div className="flex items-center p-2 rounded hover:bg-gray-700">
-                  <input
-                    id="filter-radio-example-4"
-                    type="radio"
-                    value=""
-                    name="filter-radio"
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                  />
-                  <label
-                    htmlFor="filter-radio-example-4"
-                    className="w-full ms-2 text-sm font-medium text-white rounded"
-                  >
-                    Last month
-                  </label>
-                </div>
-              </li>
-              <li>
-                <div className="flex items-center p-2 rounded hover:bg-gray-700">
-                  <input
-                    id="filter-radio-example-5"
-                    type="radio"
-                    value=""
-                    name="filter-radio"
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                  />
-                  <label
-                    htmlFor="filter-radio-example-5"
-                    className="w-full ms-2 text-sm font-medium text-white rounded"
-                  >
-                    Last year
-                  </label>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <label htmlFor="table-search" className="sr-only">
-          Search
-        </label>
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center ps-3 pointer-events-none">
-            <svg
-              className="w-5 h-5 text-gray-500"
-              aria-hidden="true"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
+        <div className="flex gap-4 flex-wrap">
           <input
-            type="text"
-            id="table-search"
-            className="block p-2 ps-10 text-sm text-white border border-gray-300 rounded-lg w-80 bg-black focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Search for items"
+            type="date"
+            value={dateRange.start}
+            onChange={(e) =>
+              setDateRange((prev) => ({ ...prev, start: e.target.value }))
+            }
+            className="block p-2 text-sm text-white border border-gray-300 rounded-lg w-full sm:w-40 bg-black focus:ring-blue-500 focus:border-blue-500"
           />
+          <input
+            type="date"
+            value={dateRange.end}
+            onChange={(e) =>
+              setDateRange((prev) => ({ ...prev, end: e.target.value }))
+            }
+            className="block p-2 text-sm text-white border border-gray-300 rounded-lg w-full sm:w-40 bg-black focus:ring-blue-500 focus:border-blue-500"
+          />
+          <button
+            onClick={handleDateRangeChange}
+            className="ml-2 inline-flex items-center text-white bg-blue-600 border border-gray-300 focus:outline-none hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 font-medium rounded-lg text-sm px-4 py-2"
+          >
+            Apply
+          </button>
         </div>
+
+        <input
+          type="text"
+          placeholder="Search by customer name"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)} // Update search term on change
+          className="block p-2 text-sm text-white border border-gray-300 rounded-lg w-full sm:w-60 bg-black focus:ring-blue-500 focus:border-blue-500"
+        />
+
+        <CSVLink
+          data={filteredOrders}
+          headers={csvHeaders}
+          filename="order-details.csv"
+          className="inline-flex items-center text-white bg-green-600 border border-gray-300 focus:outline-none hover:bg-green-700 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm px-4 py-2 mt-4 sm:mt-0"
+        >
+          Export CSV
+        </CSVLink>
       </div>
-      <div>
+      <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-white">
           <thead className="text-xs text-gray-400 uppercase bg-gray-800">
             <tr>
               <th scope="col" className="px-6 py-3">
-                Order ID
+                Order Number
               </th>
               <th scope="col" className="px-6 py-3">
-                Product
+                Customer Name
               </th>
               <th scope="col" className="px-6 py-3">
-                Customer
+                Phone
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Booking Date
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Delivery Date
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Bill Invoice No
               </th>
               <th scope="col" className="px-6 py-3">
                 Status
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Date
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Total
               </th>
               <th scope="col" className="px-6 py-3">
                 Action
@@ -192,23 +174,59 @@ function OrderDetails() {
             </tr>
           </thead>
           <tbody>
-            <tr className="bg-black border-b border-gray-700 hover:bg-gray-800">
-              <td className="px-6 py-4">#12345</td>
-              <td className="px-6 py-4">Product A</td>
-              <td className="px-6 py-4">Customer X</td>
-              <td className="px-6 py-4">Shipped</td>
-              <td className="px-6 py-4">2024-08-07</td>
-              <td className="px-6 py-4">$100.00</td>
-              <td className="px-6 py-4">
-                <button className="font-medium text-blue-500 hover:underline">
-                  View
-                </button>
-              </td>
-            </tr>
-            {/* Add more rows as needed */}
+            {filteredOrders.length > 0 ? (
+              filteredOrders.map((order) => (
+                <tr
+                  key={order.id}
+                  className="bg-black border-b border-gray-700 hover:bg-gray-800"
+                >
+                  <td className="px-6 py-4">{order.order_no}</td>
+                  <td className="px-6 py-4">{order.name}</td>
+                  <td className="px-6 py-4">{order.phone}</td>
+                  <td className="px-6 py-4">{order.booking_date}</td>
+                  <td className="px-6 py-4">{order.delivery_date}</td>
+                  <td className="px-6 py-4">{order.bill_invoice_no}</td>
+                  <td className="px-6 py-4">
+                    <select
+                      value={order.status || "ordered"}
+                      onChange={(e) =>
+                        handleStatusChange(order.id, e.target.value)
+                      }
+                      className="bg-black text-white border border-gray-300 rounded-lg"
+                    >
+                      <option value="ordered">Ordered</option>
+                      <option value="finished">Finished</option>
+                      <option value="delivered">Delivered</option>
+                    </select>
+                  </td>
+                  <td className="px-6 py-4 flex gap-2">
+                    <button
+                      onClick={() => openEditModal(order)}
+                      className="font-medium text-2xl text-green-500 hover:underline"
+                    >
+                      <FaEdit />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8" className="px-6 py-4 text-center">
+                  No orders found
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
+
+      <EditDetailModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        currentOrder={currentOrder}
+        handleEditSubmit={handleEditSubmit}
+        setCurrentOrder={setCurrentOrder}
+      />
     </div>
   );
 }

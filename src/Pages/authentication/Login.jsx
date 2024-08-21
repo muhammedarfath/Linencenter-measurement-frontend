@@ -1,39 +1,59 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; 
-
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../Redux/Auth/authSlice";
+import { Toaster, toast } from "react-hot-toast";
 function Login() {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [error, setError] = useState(""); 
+  const [success, setSuccess] = useState(""); 
   const navigate = useNavigate();
-  
-  const handleSubmit = async (e) => {
+
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    
 
     try {
-      const response = await axios.post(
-        "http://localhost:8000/accounts/login/", 
-        {
-          email,
-          password,
-        },
-        {
-          withCredentials: true, 
-        }
-      );
+      const response = await axios.post("http://127.0.0.1:8000/accounts/login/", {
+        email,
+        password,
+      });
 
-      console.log(response.data); 
-      setSuccess("Login successful!");
-      setError("");
-      navigate("/");
+      const { access, refresh, username: userData, userId } = response.data;
+
+      dispatch(loginSuccess({ email: userData, userId: userId, token: access, refresh: refresh }));
+
+      setSuccess("Login successful."); 
+      console.log("Login successful. UserId:", userId);
+      console.log("Access token:", access);
+      console.log("Refresh token:", refresh);
+
+      navigate('/');
     } catch (error) {
-      console.error("Login failed", error);
-      setError("Invalid email or password.");
-      setSuccess("");
+      console.error("Login error:", error);
+
+      if (error.response) {
+        const status = error.response.status;
+        const data = error.response.data;
+        let errorMessage = "Login failed. Please check your credentials.";
+
+        if (status === 400) {
+          errorMessage = data.non_field_errors ? data.non_field_errors[0] : errorMessage;
+        }
+
+        setError(errorMessage); 
+        toast.error(errorMessage); 
+      } else {
+        setError("An error occurred. Please check your network connection and try again.");
+        toast.error("An error occurred. Please check your network connection and try again.");
+      }
     }
+  };
+
+  const handleSignupClick = () => {
+    navigate("/signup");
   };
 
   return (
@@ -62,7 +82,7 @@ function Login() {
               {success && (
                 <div className="text-green-500 text-sm">{success}</div>
               )}
-              <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+              <form className="space-y-4 md:space-y-6" onSubmit={handleLoginSubmit}>
                 <div>
                   <label
                     htmlFor="email"
@@ -77,7 +97,7 @@ function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    placeholder="name@company.com"
+                    placeholder="email"
                     required
                   />
                 </div>
@@ -94,7 +114,7 @@ function Login() {
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="password"
                     className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     required
                   />
@@ -109,6 +129,7 @@ function Login() {
             </div>
           </div>
         </div>
+        <Toaster position="top-right" reverseOrder={false} />
       </section>
     </div>
   );

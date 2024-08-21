@@ -1,37 +1,87 @@
 import React, { useState } from "react";
-import { Navigate } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { signUp } from "../../actions/auth"; 
-import CSRFToken from '../../components/CSRFToken';
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Toaster, toast } from "react-hot-toast";
 
-function SignUp({ signUp, isAuthenticated }) {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    re_password: "",
-  });
-  const [accountCreated, setAccountCreated] = useState(false);
 
-  const { email, password, re_password } = formData;
+function SignUp() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [re_password, setRePassword] = useState("");
+  const navigate = useNavigate();
 
-  const onChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const onSubmit = (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
 
-    if (password === re_password) {
-      signUp(email, password, re_password); 
-      setAccountCreated(true);
+    if (!email || !password || !re_password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
+    if (password !== re_password) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/accounts/sign_up/",
+        {
+          email,
+          password,
+          re_password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        toast.success("User successfully registered.");
+        setEmail("");
+        setPassword("");
+        setRePassword("");
+        navigate("/login");
+      } else {
+        toast.error("Signup request failed: " + response.statusText);
+      }
+    } catch (error) {
+      if (error.response) {
+        const status = error.response.status;
+        const data = error.response.data;
+
+        if (status === 400) {
+          let errorMessage = "";
+          if (data.email) {
+            errorMessage = data.email[0];
+          } else if (data.non_field_errors) {
+            errorMessage = data.non_field_errors[0];
+          } else {
+            errorMessage = "An error occurred. Please try again later.";
+          }
+
+          toast.error(errorMessage);
+        } else {
+          toast.error("An error occurred. Please try again later.");
+        }
+      } else {
+        toast.error(
+          "An error occurred. Please check your network connection and try again."
+        );
+      }
     }
   };
 
-  if (isAuthenticated) return <Navigate to="/" />;
-  else if (accountCreated) return <Navigate to="/login" />;
+  const handleLoginLinkClick = () => {
+    navigate("/login");
+  };
 
   return (
     <div>
       <section>
+      <Toaster position="top-right" reverseOrder={false} />
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <a
             href="#"
@@ -50,8 +100,10 @@ function SignUp({ signUp, isAuthenticated }) {
                 Sign up for an account
               </h1>
 
-              <form className="space-y-4 md:space-y-6" onSubmit={onSubmit}>
-                <CSRFToken />
+              <form
+                className="space-y-4 md:space-y-6"
+                onSubmit={handleSignupSubmit}
+              >
                 <div>
                   <label
                     htmlFor="email"
@@ -64,7 +116,7 @@ function SignUp({ signUp, isAuthenticated }) {
                     name="email"
                     id="email"
                     value={email}
-                    onChange={onChange}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     placeholder="name@company.com"
                     required
@@ -82,7 +134,7 @@ function SignUp({ signUp, isAuthenticated }) {
                     name="password"
                     id="password"
                     value={password}
-                    onChange={onChange}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     required
@@ -100,7 +152,7 @@ function SignUp({ signUp, isAuthenticated }) {
                     name="re_password"
                     id="re_password"
                     value={re_password}
-                    onChange={onChange}
+                    onChange={(e) => setRePassword(e.target.value)}
                     placeholder="••••••••"
                     className="bg-black border border-gray-300 text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     required
@@ -113,6 +165,14 @@ function SignUp({ signUp, isAuthenticated }) {
                   Sign Up
                 </button>
               </form>
+              <div className="text-center mt-4">
+                <button
+                  onClick={handleLoginLinkClick}
+                  className="text-blue-500 hover:underline"
+                >
+                  Already have an account? Log in
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -121,8 +181,4 @@ function SignUp({ signUp, isAuthenticated }) {
   );
 }
 
-const mapStateToProps = state => ({
-  isAuthenticated: state.auth.isAuthenticated
-});
-
-export default connect(mapStateToProps, { signUp })(SignUp);
+export default SignUp;

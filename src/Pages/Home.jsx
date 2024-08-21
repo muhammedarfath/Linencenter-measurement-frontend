@@ -1,12 +1,23 @@
-"use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { LampContainer } from "../components/ui/lamp";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Toaster, toast } from "react-hot-toast";
 
 export function Home() {
+  const { userId } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (userId == null) {
+      navigate("/login");
+    }
+  }, []);
+
   return (
     <div className="w-full h-full relative flex flex-col items-center justify-center">
+      <Toaster position="top-right" reverseOrder={false} />
+
       <LampContainer>
         <motion.img
           initial={{ opacity: 0.5, y: 100 }}
@@ -44,13 +55,13 @@ export function Home() {
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="2"
+              strokeWidth="2"
               stroke="currentColor"
               className="w-5 h-5 arrow"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
               ></path>
             </svg>
